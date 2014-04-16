@@ -5,7 +5,8 @@ import Tkinter
 
 # TODO: Fix any sort of case sensitivity for the database queries
 
-def queryForStuff():
+# Does the query based on what you picked
+def queryDatabase():
 	cur = connection.cursor() # constructs the cursor, try this before evey query
 	if query_type != 2: # for the first two options
 		if query_type == 1:
@@ -14,20 +15,20 @@ def queryForStuff():
 			isMovie = True
 		try:
 			print "executing select upper " + str(E1.get()) + str(isMovie)
-			cur.execute("SELECT * from media WHERE title=%s AND type=%s;", (str(E1.get()), str(isMovie)))
+			cur.execute("SELECT * from media WHERE title=%s AND type=%s;", (str(entry_field.get()), str(isMovie)))
 			
 			count = 0
 			for tuple in cur.fetchall():
 				count += 1
 				print tuple
-				Lb1.insert(count, str(tuple))
+				result_listbox.insert(count, str(tuple))
 
 		except StandardError, e:
 			print str(e)
 	else:
 		try:
-			print "executing select lower for genre " + str(E1.get()) 
-			sql = "SELECT * from genre WHERE title LIKE \'%"+E1.get()+"%\';"
+			print "executing select lower for genre " + str(entry_field.get()) 
+			sql = "SELECT * from genre WHERE title LIKE \'%"+v.get()+"%\';"
 			print sql
 			cur.execute(sql)
 
@@ -42,21 +43,22 @@ def queryForStuff():
 			for tuple in cur.fetchall():
 				count += 1
 				print tuple
-				Lb1.insert(count, str(tuple))
+				result_listbox.insert(count, str(tuple))
 
 		except StandardError, e:
 			print str(e)
 
 
-	Lb1.pack(fill=Tkinter.BOTH, expand=1)
+	result_listbox.pack(fill=Tkinter.BOTH, expand=1)
 	cur.close()
-
-def sel():
-	print "var: " + str(var.get())
+	
+# Deals with the RadioButton based on the selection
+def radioSelection():
+	print "rb_choice: " + str(rb_choice.get())
 	global query_type
-	if var.get() == 1:		
+	if rb_choice.get() == 1:		
 		query_type = 0 # if it is a Movie
-	elif var.get() == 2:
+	elif rb_choice.get() == 2:
 		query_type = 1 # if it is a TV Show
 	else:
 		query_type = 2 # if it is a Genre
@@ -71,38 +73,43 @@ try:
 except StandardError, e:
 	print str(e)
 	exit
+	
+######Global Vars#######
+query_type = 0
+rb_choice = Tkinter.IntVar()
+rb_choice.set(1)
+########################
 
+# Initialize main GUI elements
 top = Tkinter.Tk() # root tkinter thingy
 top.maxsize(700,700)
 top.minsize(700,700)
 
-######Global Vars#######
-query_type = 0
-var = Tkinter.IntVar()
-var.set(1)
-########################
-
 entryFrame = Tkinter.Frame(top)
 resultFrame = Tkinter.Frame(top)
 
-E1 = Tkinter.Entry(entryFrame, bd =5)
-L1 = Tkinter.Label(entryFrame, text="Title")
-Lb1 = Tkinter.Listbox(resultFrame, height =35, width = 80)
+result_listbox = Tkinter.Listbox(resultFrame, height =35, width = 80)
 
-E1.pack(side = Tkinter.RIGHT)
-L1.pack( side = Tkinter.RIGHT)
-B = Tkinter.Button(entryFrame, text ="Query!", command = queryForStuff)
+entry_field = Tkinter.Entry(entryFrame, bd =5)
+entry_label = Tkinter.Label(entryFrame, text="Title")
 
+query_button = Tkinter.Button(entryFrame, text ="Query!", command = queryDatabase)
 
-R1 = Tkinter.Radiobutton(entryFrame, text="Movie Title", variable=var, value=1, command=sel)
-R1.pack(anchor = Tkinter.W)
+# rb stands for RadioButton
+rb_movie = Tkinter.Radiobutton(entryFrame, text="Movie Title", variable=rb_choice, value=1, command=radioSelection)
+rb_tvshow = Tkinter.Radiobutton(entryFrame, text="TV Show Title", variable=rb_choice, value=2, command=radioSelection)
+rb_movie_genre = Tkinter.Radiobutton(entryFrame, text="Genre for Movies", variable=rb_choice, value=3, command=radioSelection)
 
-R2 = Tkinter.Radiobutton(entryFrame, text="TV Show Title", variable=var, value=2, command=sel)
-R2.pack(anchor = Tkinter.W)
+# Making GUI items visible
+entry_field.pack(side = Tkinter.RIGHT)
+entry_label.pack( side = Tkinter.RIGHT)
 
-R3 = Tkinter.Radiobutton(entryFrame, text="Genre for Movies", variable=var, value=3, command=sel)
-R3.pack(anchor = Tkinter.W)
-B.pack(anchor = Tkinter.S)
+rb_movie.pack(anchor = Tkinter.W)
+rb_tvshow.pack(anchor = Tkinter.W)
+rb_movie_genre.pack(anchor = Tkinter.W)
+
+query_button.pack(anchor = Tkinter.S)
+
 entryFrame.pack(anchor = Tkinter.CENTER)
 resultFrame.pack()
 # main()
