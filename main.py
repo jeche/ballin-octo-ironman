@@ -111,7 +111,7 @@ def queryFromGenreTitle(genre_title):
 	media_list = []
 	try:
 		print "executing select upper " + str(genre_title) + str(isMovie)
-		sql = "SELECT * from genre WHERE title LIKE \'%"+genre_title+"%\';"
+		sql = "SELECT * from genre WHERE title ILIKE \'%"+genre_title+"%\';"
 		cur.execute(sql)
 		print sql
 
