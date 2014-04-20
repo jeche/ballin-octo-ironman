@@ -245,7 +245,7 @@ def queryFromGenreTitle(genre_title):
 	cur = connection.cursor()
 	media_list = []
 	try:
-		sql = "SELECT * from genre WHERE title LIKE \'%"+genre_title+"%\';"
+		sql = "SELECT * from genre WHERE title ILIKE \'%"+genre_title+"%\';"
 		cur.execute(sql)
 		print sql
 
