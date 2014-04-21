@@ -15,6 +15,8 @@ movieDB     = "https://api.themoviedb.org/3/"
 movieKey    = "?api_key=709ba15ae33dc7539d0223508bdc6f0d"
 inTheater   = "movie/now_playing"+movieKey
 getMovie    = "movie/" 
+
+IMDB_CRAP = "http://omdbapi.com/?i="
 status_code = 200 
 
 def get(url):
@@ -25,6 +27,15 @@ def get(url):
 		return json.load(request)
 	else:
 		return None
+def yes(req):
+	return int(req.status_code)==200
+def yess(req):
+	return bool(req['Response'])
+def fetchMovie(url):
+	request = urllib2.Request(url, None, {'user-agent':'whatever'})
+	opener = urllib2.build_opener()
+	stream = opener.open(request)
+	return json.load(stream)
 
 
 # def nowPlaying():
@@ -156,21 +167,52 @@ def main():
 						poster  = currMov['poster_path']
 						imdb_id = str(currMov["imdb_id"])[2:]
 
-						curr.execute("INSERT INTO MEDIA(Entry_ID, Title, Type, Poster) VALUES (%d, \'%s\', TRUE, \'%s\');" %(mov_id, title.replace("'"," "), poster))
-						connection.commit()
-						cmd = "SELECT ID FROM MEDIA WHERE Entry_ID = %d;" % (mov_id)
-						print(cmd)
-						curr.execute(cmd)
-						for i in curr:
-							media_id = i[0]
+
 
 						if(len(imdb_id)!=0):
-							curr.execute("INSERT INTO MOVIES VALUES (%d, %d, \'%s\', \'%s\', NULL, NULL, NULL, NULL);" % (mov_id, media_id, imdb_id, reldate))
+							curr.execute("INSERT INTO MEDIA(Entry_ID, Title, Type, Poster) VALUES (%d, \'%s\', TRUE, \'%s\');" %(mov_id, title.replace("'"," "), poster))
+							connection.commit()
+							cmd = "SELECT ID FROM MEDIA WHERE Entry_ID = %d;" % (mov_id)
+							curr.execute(cmd)
+							for i in curr:
+								media_id = i[0]
+							page     = fetchMovie(IMDB_CRAP+"tt"+imdb_id);
+							if(yess(page)):
+								rated = None
+								imdb_rating = None
+								if('imdbRating' in page):
+									imdb_rating = page['imdbRating']
+					
+								
+								if('Rated' in page):
+									rated = page['Rated']
+								if(imdb_rating != 'N/A' and imdb_rating is not None):
+									imdb_rating = float(imdb_rating)
+									# print(imdb_rating, int(imdb_rating*10))
+									if(rated is not None):
+										curr.execute("INSERT INTO MOVIES VALUES (%d, %d, \'%s\', \'%s\', NULL, NULL, %d, \'%s\');" % (mov_id, media_id, imdb_id, reldate, imdb_rating*10,rated ))
+									else:
+										print(page)
+										curr.execute("INSERT INTO MOVIES VALUES (%d, %d, \'%s\', \'%s\', NULL, NULL, %d, NULL);" % (mov_id, media_id, imdb_id, reldate, imdb_rating*10))
+
+								elif(rated is not None):
+									curr.execute("INSERT INTO MOVIES VALUES (%d, %d, \'%s\', \'%s\', NULL, NULL, NULL, \'%s\');" % (mov_id, media_id, imdb_id, reldate, rated))
+								else:
+									print(page)
+									curr.execute("INSERT INTO MOVIES VALUES (%d, %d, \'%s\', \'%s\', NULL, NULL, NULL, NULL);" % (mov_id, media_id, imdb_id, reldate))
+
+							else:
+								curr.execute("INSERT INTO MOVIES VALUES (%d, %d, \'%s\', \'%s\', NULL, NULL, NULL, NULL);" % (mov_id, media_id, imdb_id, reldate))
+
 							connection.commit()
 							if(runtime != None and descr !=None):
-								curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', %d, \'%s\');" %(mov_id, reldate, int(runtime), descr[0:254].replace("'","")))
+								if(len(descr)>600):
+									descr = descr[:599]
+								curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', %d, \'%s\');" %(mov_id, reldate, int(runtime), descr.replace("'","")))
 							elif(descr!=None):
-								curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', NULL, \'%s\');" %(mov_id, reldate, descr[0:254].replace("'","")))
+								if(len(descr)>600):
+									descr = descr[:599]
+								curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', NULL, \'%s\');" %(mov_id, reldate, descr.replace("'","")))
 							elif(runtime != None):
 								curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', %d, NULL);" %(mov_id, reldate, int(runtime)))
 
