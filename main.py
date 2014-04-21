@@ -8,6 +8,8 @@ import base64
 import Image
 from PIL import Image, ImageTk
 from collections import deque
+from updateMovieOpenings import UpdateNowPlaying
+from updateTV import UpdateTv
 
 class item_container:
 	def __init__(self, item, parent, isActor):
@@ -403,7 +405,13 @@ def on_select(event):
 	U_RATING.place(x = 400, y = 140)
 	IMDB_Rating.place(x = 400, y = 160)
 	
+movieUpdate = UpdateNowPlaying()
+tvUpdate   = UpdateTv()
+t1 = threading.Thread(target=movieUpdate.run)
+t2 = threading.Thread(target=tvUpdate.run)
 
+t1.start()
+t2.start()
 # Initialize main GUI elements
 top = Tkinter.Tk() # root tkinter thingy
 
