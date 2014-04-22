@@ -1,8 +1,9 @@
 
 -- DROP TABLE GENRE_MTV;
-DROP TABLE OPENINGS_WEEK; 
--- DROP TABLE CURRENT_TV_SCHEDULE; 
-DROP TABLE MOVIES; 
+-- DROP TABLE OPENINGS_WEEK; 
+DROP TABLE CURRENT_TV_SCHEDULE; 
+DROP TABLE NOW_PLAYING;
+-- DROP TABLE MOVIES; 
 -- DROP TABLE TV; 
 -- DROP TABLE JOBS;
 -- DROP TABLE WORKERS; 
@@ -20,17 +21,17 @@ DROP TABLE MOVIES;
 -- primary key (ID)
 -- );
 
-CREATE TABLE MOVIES(
-Movie_ID int NOT NULL,
-Media_ID int unique REFERENCES Media(ID),
-IMDB_ID VARCHAR(255) unique NOT NULL,
-Release_Date date,
-CRATING int,
-URating int,
-IMDB_Rating int,
-MPAA_RATING VARCHAR(20),
-primary key (Movie_ID)
-);
+-- CREATE TABLE MOVIES(
+-- Movie_ID int NOT NULL,
+-- Media_ID int unique REFERENCES Media(ID),
+-- IMDB_ID VARCHAR(255) unique NOT NULL,
+-- Release_Date date,
+-- CRATING int,
+-- URating int,
+-- IMDB_Rating int,
+-- MPAA_RATING VARCHAR(20),
+-- primary key (Movie_ID)
+-- );
 
 -- CREATE TABLE TV(
 -- TV_ID int NOT NULL,
@@ -42,27 +43,28 @@ primary key (Movie_ID)
 -- primary key (TV_ID)
 -- );
 
-CREATE TABLE OPENINGS_WEEK(
+CREATE TABLE NOW_PLAYING(
 M_ID int NOT NULL REFERENCES Movies(Movie_ID),
 Premiere_Date date,
 Running_Time int,
-Description VARCHAR(255),
+Description VARCHAR(600),
 primary key(M_ID)
 );
 
--- CREATE TABLE CURRENT_TV_SCHEDULE(
--- TV_ID int NOT NULL REFERENCES TV(TV_ID),
--- Time date,
--- Broad_Comp VARCHAR(125),
--- Ep_No int,
--- S_No int,
--- Description VARCHAR(255),
--- primary key (TV_ID, Time)
--- );
+CREATE TABLE CURRENT_TV_SCHEDULE(
+TV_ID int NOT NULL REFERENCES TV(TV_ID),
+Time timestamp,
+Title VARCHAR(255),
+Broad_Comp VARCHAR(200),
+Ep_No VARCHAR(100),
+S_No VARCHAR(100),
+Description VARCHAR(600),
+primary key (TV_ID, Time, Broad_Comp)
+);
 
 -- CREATE TABLE WORKERS(
 -- W_ID INT NOT NULL,
--- Name int,
+-- Name VARCHAR(255),
 -- primary key(W_ID)
 -- );
 

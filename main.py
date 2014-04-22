@@ -8,6 +8,8 @@ import base64
 import Image
 from PIL import Image, ImageTk
 from collections import deque
+from updateMovieOpenings import UpdateNowPlaying
+from updateTV import UpdateTv
 
 
 class SimpleTable(Tkinter.Frame):
@@ -844,7 +846,13 @@ def on_select(event):
 	C_RATING.place(x = 400, y = 180)
 	U_RATING.place(x = 400, y = 200)
 	
+# movieUpdate = UpdateNowPlaying()
+# tvUpdate   = UpdateTv()
+# t1 = threading.Thread(target=movieUpdate.run)
+# t2 = threading.Thread(target=tvUpdate.run)
 
+# t1.start()
+# t2.start()
 # Initialize main GUI elements
 top = Tkinter.Tk() # root tkinter thingy
 
