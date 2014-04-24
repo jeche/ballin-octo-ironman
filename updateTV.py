@@ -85,9 +85,9 @@ class UpdateTv:
 
 	def insertCurrTV(self, tv_id, full_date, title, network, episode, season, descrip):
 		if(episode is not None and descrip is not None):
-			self.curr.execute("INSERT INTO CURRENT_TV_SCHEDULE VALUES (%d, \'%s\', \'%s\', \'%s\', \'%s\',\'%s\',\'%s\');" %(tv_id, full_date, title.replace("'", ''), network, episode, season, descrp.replace("'",'')))
+			self.curr.execute("INSERT INTO CURRENT_TV_SCHEDULE VALUES (%d, \'%s\', \'%s\', \'%s\', \'%s\',\'%s\',\'%s\');" %(tv_id, full_date, title.replace("'", ''), network, episode, season, descrip.replace("'",'')))
 		elif(episode is None and descrip is not None):
-			self.curr.execute("INSERT INTO CURRENT_TV_SCHEDULE VALUES (%d, \'%s\', \'%s\', \'%s\', NULL,\'%s\',\'%s\');" %(tv_id, full_date, title.replace("'", ''), network, season, descrp.replace("'",'')))
+			self.curr.execute("INSERT INTO CURRENT_TV_SCHEDULE VALUES (%d, \'%s\', \'%s\', \'%s\', NULL,\'%s\',\'%s\');" %(tv_id, full_date, title.replace("'", ''), network, season, descrip.replace("'",'')))
 
 		elif(episode is not None and descrip is None):
 			self.curr.execute("INSERT INTO CURRENT_TV_SCHEDULE VALUES (%d, \'%s\', \'%s\', \'%s\', \'%s\',\'%s\',NULL);" %(tv_id, full_date, title.replace("'", ''), network, episode, season))
@@ -126,9 +126,9 @@ class UpdateTv:
 					for show in shows:
 						
 						rage_id = int(show.getElementsByTagName('sid')[0].childNodes[0].nodeValue)
-						curr.execute("SELECT tv_id from tv where rage_id=%d;" % rage_id)
+						self.curr.execute("SELECT tv_id from tv where rage_id=%d;" % rage_id)
 						tv_id = None
-						for i in curr:
+						for i in self.curr:
 							tv_id = i[0]
 						if(tv_id is not None):
 							title   = show.getElementsByTagName('title')[0].childNodes[0].nodeValue
@@ -168,7 +168,7 @@ class UpdateTv:
 											descrp = descrp[:599]
 									
 
-							self.insertCurrTV(tv_id, full_date, title, network, episode, season, descrip)
-							connection.commit()
+							self.insertCurrTV(tv_id, full_date, title, network, episode, season, descrp)
+							self.connection.commit()
 
 			time.sleep(60*60*24)

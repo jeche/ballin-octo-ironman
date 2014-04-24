@@ -38,7 +38,7 @@ class UpdateNowPlaying:
 		self.connection.commit()
 
 	
-	def insertMovies(self, mov_id, imdb_id, reldate, imdbRating, rated):
+	def insertMovies(self, mov_id,media_id, imdb_id, reldate, imdb_rating, rated):
 		if(imdb_rating != 'N/A' and imdb_rating is not None):
 			imdb_rating = float(imdb_rating)
 			# print(imdb_rating, int(imdb_rating*10))
@@ -55,13 +55,12 @@ class UpdateNowPlaying:
 		self.connection.commit()
 	
 
-	def insertMedia(self, entry_id, poster):
+	def insertMedia(self,mov_id, title , poster):
 		self.curr.execute("INSERT INTO MEDIA(Entry_ID, Title, Type, Poster) VALUES (%d, \'%s\', TRUE, \'%s\');" %(mov_id, title.replace("'"," "), poster))
 		self.connection.commit()
 
 
 	def insertNowPly(self, mov_id, reldate, runtime, descr):
-		curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', %d, \'%s\');" %(mov_id, reldate, int(runtime), descr.replace("'","")))
 		if(runtime != None and descr !=None):
 			if(len(descr)>600):
 				descr = descr[:599]
@@ -102,7 +101,7 @@ class UpdateNowPlaying:
 			pageNum  = 1
 			reqCount = 1
 			self.clearTable()
-			movPage  = get(movieDB+inTheater)
+			movPage  = self.get(movieDB+inTheater)
 			if(movPage is not None):
 				totPgs = int(movPage["total_pages"])
 				totRes = int(movPage["total_results"])
@@ -113,7 +112,7 @@ class UpdateNowPlaying:
 						mov_id  = movie['id']
 						title   = movie['original_title']
 						reldate = movie['release_date']
-						currMov   = get(movieDB+getMovie+str(movie["id"])+movieKey)
+						currMov   = self.get(movieDB+getMovie+str(movie["id"])+movieKey)
 						reqCount +=1
 
 						if(reqCount %30==0):
@@ -124,7 +123,7 @@ class UpdateNowPlaying:
 							runtime = currMov['runtime']
 
 							self.curr.execute("SELECT COUNT(*) FROM MOVIES WHERE MOVIE_ID=%d;" % mov_id)
-							for i in curr:
+							for i in self.curr:
 								count = i[0]
 							if(count==0):
 								title   = unicodedata.normalize('NFKD', title).encode('ascii', 'ignore')
@@ -135,6 +134,7 @@ class UpdateNowPlaying:
 
 								if(len(imdb_id)!=0):
 									self.insertMedia(mov_id, title.replace("'",''), poster)
+									self.connection.commit()
 									cmd = "SELECT ID FROM MEDIA WHERE Entry_ID = %d;" % (mov_id)
 									self.curr.execute(cmd)
 									for i in self.curr:
@@ -143,7 +143,7 @@ class UpdateNowPlaying:
 									page     = self.fetchMovie(IMDB_CRAP+"tt"+imdb_id);
 									rated = None
 									imdb_rating = None
-									if(yess(page)):
+									if(self.yess(page)):
 
 										if('imdbRating' in page):
 											imdb_rating = page['imdbRating']

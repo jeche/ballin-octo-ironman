@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 from collections import deque
 from updateMovieOpenings import UpdateNowPlaying
 from updateTV import UpdateTv
-
+import threading
 
 class SimpleTable(Tkinter.Frame):
     def __init__(self, parent, rows=10, columns=2):
@@ -846,13 +846,13 @@ def on_select(event):
 	C_RATING.place(x = 400, y = 180)
 	U_RATING.place(x = 400, y = 200)
 	
-# movieUpdate = UpdateNowPlaying()
-# tvUpdate   = UpdateTv()
-# t1 = threading.Thread(target=movieUpdate.run)
-# t2 = threading.Thread(target=tvUpdate.run)
+movieUpdate = UpdateNowPlaying()
+tvUpdate   = UpdateTv()
+t1 = threading.Thread(target=movieUpdate.run)
+t2 = threading.Thread(target=tvUpdate.run)
 
-# t1.start()
-# t2.start()
+t1.start()
+t2.start()
 # Initialize main GUI elements
 top = Tkinter.Tk() # root tkinter thingy
 
