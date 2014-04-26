@@ -64,16 +64,16 @@ class UpdateNowPlaying:
 		if(runtime != None and descr !=None):
 			if(len(descr)>600):
 				descr = descr[:599]
-			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', %d, \'%s\');" %(mov_id, reldate, int(runtime), descr.replace("'","")))
+			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, %d, \'%s\');" %(mov_id, int(runtime), descr.replace("'","")))
 		elif(descr!=None):
 			if(len(descr)>600):
 				descr = descr[:599]
-			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', NULL, \'%s\');" %(mov_id, reldate, descr.replace("'","")))
+			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, NULL, \'%s\');" %(mov_id, descr.replace("'","")))
 		elif(runtime != None):
-			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', %d, NULL);" %(mov_id, reldate, int(runtime)))
+			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, %d, NULL);" %(mov_id, int(runtime)))
 
 		else:
-			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, \'%s\', NULL, NULL);" %(mov_id, reldate))
+			self.curr.execute("INSERT INTO NOW_PLAYING VALUES (%d, NULL, NULL);" %(mov_id))
 
 		self.connection.commit()
 
@@ -118,7 +118,7 @@ class UpdateNowPlaying:
 						if(reqCount %30==0):
 							time.sleep(10)
 
-						if(currMov is not None):	
+						if(currMov is not None and len(reldate) != 0):	
 							descr   = currMov['overview']
 							runtime = currMov['runtime']
 
@@ -155,12 +155,13 @@ class UpdateNowPlaying:
 
 									self.insertMovies(mov_id, media_id, imdb_id, reldate, imdb_rating, rated)
 
-									self.insertNowPly(mov_id, reldate, runtime, descr)										
+									self.insertNowPly(mov_id, reldate, runtime, descr)
+							else:
+								self.insertNowPly(mov_id, reldate, runtime, descr)										
 								
 							print(mov_id, title, reqCount, pageNum)
 						else:
-							print("SHIT ",mov_id, " ", status_code)
-
+							print("SHIT ",mov_id, " ",  self.status_code)
 
 				   	pageNum  +=1
 				   	if(pageNum <= totPgs):
@@ -171,5 +172,8 @@ class UpdateNowPlaying:
 				   		reqCount+=1
 						if(reqCount %30==0):
 							time.sleep(10)
-			time.sleep(60*60*24 - ((reqCount/30)*10))
+			time.sleep(60*60*24)
 
+
+main = UpdateNowPlaying()
+main.run()

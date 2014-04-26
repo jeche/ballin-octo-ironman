@@ -148,8 +148,8 @@ class UpdateTv:
 							RagePage   = urllib2.urlopen(link).read()
 							parser = DescripFind()
 							parser.feed(RagePage)
-							# print(rage_id, title, episode, season, link)
-							# print(show.attributes['name'].value, date, time)
+							print(rage_id, title, episode, season, link)
+							#print(show.attributes['name'].value, date, time)
 							
 							insert  = ""
 							full_date = date+" "+time
@@ -172,3 +172,6 @@ class UpdateTv:
 							self.connection.commit()
 
 			time.sleep(60*60*24)
+
+main = UpdateTv()
+main.run()
