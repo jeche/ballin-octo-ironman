@@ -6,7 +6,7 @@ import psycopg2
 import getpass
 import sys 
 import json
-import time
+import time as Time
 import unicodedata
 from xml.dom.minidom import parseString
 from xml.dom import minidom
@@ -171,7 +171,7 @@ class UpdateTv:
 							self.insertCurrTV(tv_id, full_date, title, network, episode, season, descrp)
 							self.connection.commit()
 
-			time.sleep(60*60*24)
+			Time.sleep(60*60*24)
 
 main = UpdateTv()
 main.run()
